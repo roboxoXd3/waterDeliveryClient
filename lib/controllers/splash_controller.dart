@@ -13,11 +13,11 @@ class SplashController extends GetxController {
         const Duration(
           seconds: 3,
         ), () async {
-      if (await authController.isLoggedIn()) {
+      // if (await authController.isLoggedIn()) {
         Get.offAllNamed(Routes.homePage);
-      } else {
-        Get.offAllNamed(Routes.loginPage);
-      }
+      // } else {
+      //   Get.offAllNamed(Routes.loginPage);
+      // }
     });
   }
 }

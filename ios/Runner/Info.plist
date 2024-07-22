@@ -28,6 +28,12 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need your location to deliver water to your exact location.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>We need your location to provide delivery updates even when the app is not in use.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>We need your location to ensure accurate delivery times and updates.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
