@@ -107,7 +107,10 @@ class AppTranslations extends Translations {
           "passwordMsg": "The password should be 6 characters or longer",
           "passwordConfirmMsg":
               "The confirm password is not matched with a password",
-
+"morning": "Good morning",
+  "afternoon": "Good afternoon",
+  "evening": "Good evening",
+  "night": "Good night",
           // Add more translations here
         },
         'hi_IN': {
@@ -223,7 +226,11 @@ class AppTranslations extends Translations {
 
           "order_summary": "ऑर्डर सारांश",
           "payment_method": "भुगतान विधि",
-          "add_new_payment_method": "नई भुगतान विधि जोड़ें"
+          "add_new_payment_method": "नई भुगतान विधि जोड़ें",
+          "morning": "सुप्रभात",
+  "afternoon": "नमस्ते",
+  "evening": "शुभ संध्या",
+  "night": "शुभ रात्रि"
 
           // Add more translations here
         },

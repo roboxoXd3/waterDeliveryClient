@@ -1,3 +1,5 @@
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:sheetal_raj_jal/controllers/cartController.dart';
 import 'package:sheetal_raj_jal/controllers/languageController.dart';
@@ -12,15 +14,84 @@ import '../screens/SupportPage.dart';
 
 class HomePageController extends GetxController {
   final _selectedIndex = 0.obs;
-  var products = <Product>[].obs;
-  var isLoading = true.obs;
-CartController cartController = CartController();
-LanguageController languageController = LanguageController();
-LoginController loginController = LoginController();
+  int productIndex = 0;
+  String currentGreeting = '';
+  List<Product> products = List.empty(growable: true);
+  bool isLoading = true;
+  String getLocation = 'Unknown';
+  CartController cartController = CartController();
+  LanguageController languageController = LanguageController();
+  LoginController loginController = LoginController();
   @override
   void onInit() {
+    currentGreeting = greeting();
+    isLoading = true;
     fetchProducts();
+    getCurrentLocPosition();
     super.onInit();
+  }
+
+  Future<void> getCurrentLocPosition() async {
+    final hasPermission = await handleLocationPermission();
+
+    if (!hasPermission) {
+      getLocation = "Location Disabled";
+      return;
+    }
+    getLocation = "Loading...";
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      print(position.latitude + position.longitude);
+
+      List<Placemark> addresses =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      Placemark firstAddress = addresses.first;
+      print(firstAddress);
+
+      String userAddress = firstAddress.locality.toString();
+      getLocation = userAddress;
+      print('$userAddress ---sj');
+    } catch (e) {
+      print(e.toString());
+      getLocation = 'Error getting location: $e';
+    }
+    update();
+  }
+
+  Future<bool> handleLocationPermission() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return false;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return false;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return false;
+    }
+
+    return true;
+  }
+
+  String greeting() {
+    var hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'morn';
+    }
+    if (hour < 17) {
+      return 'after';
+    }
+    if (hour < 22) {
+      return 'even';
+    }
+    return 'night';
   }
 
   int get selectedIndex => _selectedIndex.value;
@@ -33,44 +104,26 @@ LoginController loginController = LoginController();
 
   void changeIndex(int index) {
     _selectedIndex.value = index;
-    // TODO: Implement navigation to other pages
   }
 
-  get currentPage => _pages[selectedIndex];
 
-  // final List<Product> products = [
-  //   Product(
-  //     id: '1',
-  //     nameKey: '15_litre'.tr,
-  //     price: 50.0,
-  //     imageUrl: 'assets/15litreJar.png',
-  //   ),
-  //   Product(
-  //     id: '2',
-  //     nameKey: '25_litre'.tr,
-  //     price: 80.0,
-  //     imageUrl: 'assets/25LitreJar.png',
-  //   ),
-  //   // Add more products as needed
-  // ];
+ get currentPage => _pages[selectedIndex];
 
   Future<void> fetchProducts() async {
     try {
-      isLoading(true);
       final response = await Supabase.instance.client
           .from('products')
           .select()
           .order('name');
       final List<dynamic> data = response as List<dynamic>;
-      products.value = data.map((json) => Product.fromJson(json)).toList();
-      print("Products in the database are: ${products[0].name}");
-      print("Products in the database are: ${products[0].description}");
-      print("Products in the database are: ${products[0].imageUrl}");
-      print("Products in the database are: ${products[0].id}");
-      // return (response as List<dynamic>).cast<Map<String, dynamic>>();
+      products = data.map((json) => Product.fromJson(json)).toList();
+      isLoading = false;
     } catch (e) {
+      isLoading = false;
+
       print('Error fetching products: $e');
-      rethrow; // Re-throw the error after logging
+      rethrow;
     }
+    update();
   }
 }
