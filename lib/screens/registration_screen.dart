@@ -130,9 +130,100 @@
 //     );
 //   }
 //
-
+//   // Creates a styled sign-up button
+//   Widget _buildSignUpButton() {
+//     return ElevatedButton(
+//       child: Text(
+//         'signup'.tr,
+//         style: GoogleFonts.poppins(fontSize: 18),
+//       ),
+//       style: ElevatedButton.styleFrom(
+//         foregroundColor: AppColors.backgroundColor,
+//         backgroundColor: AppColors.primaryColor,
+//         padding: EdgeInsets.symmetric(
+//           vertical: 15,
+//           horizontal: 30,
+//         ),
+//         shape: RoundedRectangleBorder(
+//           borderRadius: BorderRadius.circular(30),
+//         ),
+//       ),
+//       onPressed: () {
+//         // TODO: Implement sign-up logic
+//         Get.toNamed('/main');
+//         // Get.toNamed('/homepage');
+//       },
+//     );
+//   }
+//
+//   // Creates social sign-up options
+//   Widget _buildSocialSignUp() {
+//     return Column(
+//       children: [
+//         Text(
+//           'or_signup_with'.tr,
+//           style: TextStyle(color: AppColors.textColor, fontSize: 20),
+//         ),
+//         SizedBox(height: 10),
+//         Row(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             GestureDetector(
+//               onTap: null,
+//               child: Image.asset(
+//                 'assets/facebookIcon.png',
+//                 height: 40,
+//                 width: 40,
+//               ),
+//             ),
+//             SizedBox(
+//               width: 20,
+//             ),
+//             GestureDetector(
+//               onTap: null,
+//               child: Image.asset(
+//                 'assets/gmailIcon.png',
+//                 height: 40,
+//                 width: 40,
+//               ),
+//             ),
+//           ],
+//         ),
+//       ],
+//     );
+//   }
+//
+//   // Creates a link to the login page
+//   Widget _buildLoginLink() {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: [
+//         Text(
+//           'already_have_account'.tr,
+//           style: TextStyle(color: AppColors.darkTextColor, fontSize: 20),
+//         ),
+//         GestureDetector(
+//           child: Text(
+//             ' login'.tr,
+//             style: TextStyle(
+//               color: AppColors.darkTextColor,
+//               fontWeight: FontWeight.bold,
+//               fontSize: 20,
+//               // decoration: TextDecoration.underline,
+//             ),
+//           ),
+//           onTap: () {
+//             // TODO: Navigate to login page
+//             Get.toNamed('/login');
+//           },
+//         ),
+//       ],
+//     );
+//   }
+// }
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -221,6 +312,10 @@ class RegistrationScreen extends StatelessWidget {
                                       ConstantsUtils.validatePhoneNumber(
                                           value ?? "", context),
                                   textType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(10),
+                                  ],
                                 ),
                                 const SizedBox(height: 20),
                                 _buildTextField(
@@ -277,11 +372,15 @@ class RegistrationScreen extends StatelessWidget {
   }
 
   // Creates a styled text input field
-  Widget _buildTextField(String label, IconData icon,
-      {bool isPassword = false,
-      TextEditingController? controller,
-      FormFieldValidator<String>? validator,
-      TextInputType? textType}) {
+  Widget _buildTextField(
+    String label,
+    IconData icon, {
+    bool isPassword = false,
+    TextEditingController? controller,
+    FormFieldValidator<String>? validator,
+    TextInputType? textType,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
     return TextFormField(
       obscureText: isPassword,
       style: const TextStyle(color: AppColors.darkTextColor),
@@ -289,6 +388,7 @@ class RegistrationScreen extends StatelessWidget {
       validator: validator,
       keyboardType: textType,
       autovalidateMode: AutovalidateMode.onUserInteraction,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         hintText: label,
         hintStyle: TextStyle(color: AppColors.darkTextColor.withOpacity(0.7)),

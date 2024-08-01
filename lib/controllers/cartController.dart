@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../models/cartItem.dart';
 import '../models/product.dart';
-import 'addressFormController.dart';
 
 class CartController extends GetxController {
   final cartItems = <CartItem>[].obs;
@@ -15,8 +14,7 @@ class CartController extends GetxController {
   double get deliveryFee => 0.0; // Example fixed delivery fee
 
   double get total => subtotal + deliveryFee;
-  final AddressFormController addressFormController =
-      Get.put(AddressFormController());
+ 
 
   CartController() {
     _loadCartFromStorage();

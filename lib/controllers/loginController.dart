@@ -4,6 +4,8 @@ import 'package:get_storage/get_storage.dart';
 import 'package:sheetal_raj_jal/routes/app_pages.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../data/repositories/auth_repository.dart';
+
 class LoginController extends GetxController {
   final isLoading = false.obs;
   String errorMessage = '';
@@ -11,6 +13,7 @@ class LoginController extends GetxController {
   final loginKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  AuthRepository? authRepository;
 
   Future<void> login() async {
     isLoading.value = true;
