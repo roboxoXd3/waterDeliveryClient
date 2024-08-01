@@ -151,19 +151,18 @@ class HomePage extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 10),
-                           Center(
-                             child: CachedNetworkImage(
-                                      imageUrl: controller.products[controller.productIndex].imageUrl,
-                                      fit: BoxFit.cover,
-                                      height: 300,
-                                      placeholder: (context, url) => const Center(
-                                          child: CircularProgressIndicator()),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                    ),
-                           )
-                              
-                          ,
+                          Center(
+                            child: CachedNetworkImage(
+                              imageUrl: controller
+                                  .products[controller.productIndex].imageUrl,
+                              fit: BoxFit.cover,
+                              height: 300,
+                              placeholder: (context, url) => const Center(
+                                  child: CircularProgressIndicator()),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                            ),
+                          ),
                           const SizedBox(height: 20),
                           Container(
                             height: 40,
@@ -175,31 +174,33 @@ class HomePage extends StatelessWidget {
                               padding: EdgeInsets.zero,
                               scrollDirection: Axis.horizontal,
                               itemBuilder: (context, index) {
-                                
                                 return Row(
                                   children: [
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     MaterialButton(
-                                  onPressed: () {
-                                controller.productIndex = index;
-                                 controller.update();
-                                  },
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                  color: AppColors.primaryColor,
-                                  child: Text(controller.products[index].nameKey,style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge!
-                                        .copyWith(
-                                            color: Colors.white,
-                                            fontSize: 16)),
-                                )
+                                      onPressed: () {
+                                        controller.productIndex = index;
+                                        controller.update();
+                                      },
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      color: AppColors.primaryColor,
+                                      child: Text(
+                                          controller.products[index].nameKey,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge!
+                                              .copyWith(
+                                                  color: Colors.white,
+                                                  fontSize: 16)),
+                                    )
                                   ],
                                 );
                               },
                             ),
                           ),
-                                const SizedBox(height: 20),
-
+                          const SizedBox(height: 20),
                           Center(
                             child: Column(
                               children: [
@@ -212,8 +213,9 @@ class HomePage extends StatelessWidget {
                                             color: AppColors.textColor,
                                             fontSize: 16)),
                                 const SizedBox(height: 6),
-                               Text(
-                                    controller.products[controller.productIndex].nameKey,
+                                Text(
+                                    controller.products[controller.productIndex]
+                                        .nameKey,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge!
@@ -221,7 +223,6 @@ class HomePage extends StatelessWidget {
                                             color: AppColors.textColor,
                                             fontSize: 16)),
                                 const SizedBox(height: 4),
-
                                 Text(
                                     controller.products[controller.productIndex]
                                         .description,
