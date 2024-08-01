@@ -130,97 +130,7 @@
 //     );
 //   }
 //
-//   // Creates a styled sign-up button
-//   Widget _buildSignUpButton() {
-//     return ElevatedButton(
-//       child: Text(
-//         'signup'.tr,
-//         style: GoogleFonts.poppins(fontSize: 18),
-//       ),
-//       style: ElevatedButton.styleFrom(
-//         foregroundColor: AppColors.backgroundColor,
-//         backgroundColor: AppColors.primaryColor,
-//         padding: EdgeInsets.symmetric(
-//           vertical: 15,
-//           horizontal: 30,
-//         ),
-//         shape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.circular(30),
-//         ),
-//       ),
-//       onPressed: () {
-//         // TODO: Implement sign-up logic
-//         Get.toNamed('/main');
-//         // Get.toNamed('/homepage');
-//       },
-//     );
-//   }
-//
-//   // Creates social sign-up options
-//   Widget _buildSocialSignUp() {
-//     return Column(
-//       children: [
-//         Text(
-//           'or_signup_with'.tr,
-//           style: TextStyle(color: AppColors.textColor, fontSize: 20),
-//         ),
-//         SizedBox(height: 10),
-//         Row(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             GestureDetector(
-//               onTap: null,
-//               child: Image.asset(
-//                 'assets/facebookIcon.png',
-//                 height: 40,
-//                 width: 40,
-//               ),
-//             ),
-//             SizedBox(
-//               width: 20,
-//             ),
-//             GestureDetector(
-//               onTap: null,
-//               child: Image.asset(
-//                 'assets/gmailIcon.png',
-//                 height: 40,
-//                 width: 40,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ],
-//     );
-//   }
-//
-//   // Creates a link to the login page
-//   Widget _buildLoginLink() {
-//     return Row(
-//       mainAxisAlignment: MainAxisAlignment.center,
-//       children: [
-//         Text(
-//           'already_have_account'.tr,
-//           style: TextStyle(color: AppColors.darkTextColor, fontSize: 20),
-//         ),
-//         GestureDetector(
-//           child: Text(
-//             ' login'.tr,
-//             style: TextStyle(
-//               color: AppColors.darkTextColor,
-//               fontWeight: FontWeight.bold,
-//               fontSize: 20,
-//               // decoration: TextDecoration.underline,
-//             ),
-//           ),
-//           onTap: () {
-//             // TODO: Navigate to login page
-//             Get.toNamed('/login');
-//           },
-//         ),
-//       ],
-//     );
-//   }
-// }
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -403,28 +313,54 @@ class RegistrationScreen extends StatelessWidget {
     );
   }
 
-  // Creates a styled sign-up button
+  // // Creates a styled sign-up button
+  // Widget _buildSignUpButton(RegistrationController controller) {
+  //   return MaterialButton(
+  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+  //     color: AppColors.primaryColor,
+  //     minWidth: double.infinity,
+  //     height: 46,
+  //     onPressed: () {
+  //       if (controller.registerKey.currentState!.validate()) {
+  //         controller.isLoading = true;
+  //         controller.update();
+  //         controller.register();
+  //       }
+  //     },
+  //     child: controller.isLoading
+  //         ? const CircularProgressIndicator(color: AppColors.backgroundColor)
+  //         : Text(
+  //             'signup'.tr,
+  //             style: GoogleFonts.poppins(fontSize: 18, color: Colors.white),
+  //           ),
+  //   );
+  // }
+
+// ---------New code for the button-----------
   Widget _buildSignUpButton(RegistrationController controller) {
-    return MaterialButton(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      color: AppColors.primaryColor,
-      minWidth: double.infinity,
-      height: 46,
-      onPressed: () {
-        if (controller.registerKey.currentState!.validate()) {
-          controller.isLoading = true;
-          controller.update();
-          controller.register();
-        }
-      },
-      child: controller.isLoading
-          ? const CircularProgressIndicator(color: AppColors.backgroundColor)
-          : Text(
-              'signup'.tr,
-              style: GoogleFonts.poppins(fontSize: 18, color: Colors.white),
-            ),
-    );
+    return Obx(() => MaterialButton(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          color: AppColors.primaryColor,
+          minWidth: double.infinity,
+          height: 46,
+          onPressed: controller.isLoading.value
+              ? null
+              : () {
+                  if (controller.registerKey.currentState!.validate()) {
+                    controller.register();
+                  }
+                },
+          child: controller.isLoading.value
+              ? const CircularProgressIndicator(
+                  color: AppColors.backgroundColor)
+              : Text(
+                  'signup'.tr,
+                  style: GoogleFonts.poppins(fontSize: 18, color: Colors.white),
+                ),
+        ));
   }
+// ---------End of new code for the button-----------
 
   // Creates a link to the login page
   Widget _buildLoginLink() {

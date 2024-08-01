@@ -6,8 +6,9 @@ class ConstantsUtils {
     if (value.isEmpty) {
             return "thisFieldRequired".tr;
  
-    } else
+    } else {
       return null;
+    }
   }
 
   static String? validatePassword(String value, BuildContext context) {

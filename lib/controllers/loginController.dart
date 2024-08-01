@@ -13,6 +13,7 @@ class LoginController extends GetxController {
   TextEditingController passwordController = TextEditingController();
 
   Future<void> login() async {
+    isLoading.value = true;
     try {
       final response = await Supabase.instance.client.auth.signInWithPassword(
         email: emailController.text,
@@ -31,12 +32,24 @@ class LoginController extends GetxController {
         errorMessage = 'Login failed. Please check your credentials.';
         Get.snackbar('Error', errorMessage);
       }
+    }
+    // catch (error) {
+    //   errorMessage = 'An error occurred: $error';
+    //   Get.snackbar('Error', errorMessage);
+    // } finally {
+    //   isLoading.value = false;
+    // }
+    // new------------------------//
+    on AuthException catch (error) {
+      errorMessage = 'Authentication error: ${error.message}';
+      Get.snackbar('Error', errorMessage);
     } catch (error) {
-      errorMessage = 'An error occurred: $error';
+      errorMessage = 'An unexpected error occurred: $error';
       Get.snackbar('Error', errorMessage);
     } finally {
       isLoading.value = false;
     }
+    // new------------------------//
   }
 
   Future<bool> isLoggedIn() async {

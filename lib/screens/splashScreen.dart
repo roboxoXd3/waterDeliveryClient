@@ -6,7 +6,7 @@ import 'package:sheetal_raj_jal/controllers/splash_controller.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SplashScreen extends StatelessWidget {
-   SplashScreen({super.key});
+   const SplashScreen({super.key});
 
 
   @override

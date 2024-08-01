@@ -25,7 +25,7 @@ LoginController loginController = LoginController();
 
   int get selectedIndex => _selectedIndex.value;
   final _pages = [
-    HomePage(),
+    const HomePage(),
     const OrderPage(),
     const PlansPage(),
     const SupportPage(),

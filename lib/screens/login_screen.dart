@@ -214,7 +214,7 @@ class LoginScreen extends StatelessWidget {
           ),
           onPressed: () {
             if (controller.loginKey.currentState!.validate()) {
-              controller.login;
+              controller.login();
             }
           },
           child: controller.isLoading.value
