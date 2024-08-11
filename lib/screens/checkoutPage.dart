@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sheetal_raj_jal/constants/app_text_styles.dart';
+import 'package:sheetal_raj_jal/constants/colors.dart';
 import 'package:sheetal_raj_jal/widgets/buildOrderSummaryWidget.dart';
 import '../controllers/checkoutController.dart';
 import '../widgets/deliveryTimeWidget.dart';
@@ -43,7 +45,7 @@ class CheckoutPage extends GetView<CheckoutController> {
       case 1:
         return const DeliveryTimeWidget();
       case 2:
-        return BuildOrderSummary();
+        return buildOrderSummary();
       case 3:
         return const PaymentMethodWidget();
       case 4:
@@ -84,9 +86,10 @@ class CheckoutPage extends GetView<CheckoutController> {
       child: ElevatedButton(
         onPressed: () => controller.placeOrder(),
         style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryColor,
           padding: const EdgeInsets.symmetric(vertical: 15),
         ),
-        child: Text('place_order'.tr),
+        child: Text('place_order'.tr, style: AppTextStyles.white18TextStyle),
       ),
     );
   }

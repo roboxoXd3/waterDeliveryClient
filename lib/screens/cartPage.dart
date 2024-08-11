@@ -1,4 +1,7 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import '../constants/app_text_styles.dart';
 import '../constants/colors.dart';
@@ -20,23 +23,21 @@ class CartPage extends StatelessWidget {
                 title: Text('cart'.tr,
                     style: AppTextStyles.appBarTitle
                         .copyWith(color: Colors.black)),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: () => controller.clearCart(),
-                  ),
-                ],
+                centerTitle: true,
               ),
-              body: Obx(() => controller.cartItems.isEmpty
-                  ? _buildEmptyCart()
-                  : _buildCartContent(controller)),
-              bottomNavigationBar: _buildCheckoutButton(controller),
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: controller.cartItems.isEmpty
+                    ? buildEmptyCart()
+                    : buildCartContent(controller),
+              ),
+              bottomNavigationBar: buildCheckoutButton(controller),
             );
           });
     });
   }
 
-  Widget _buildEmptyCart() {
+  Widget buildEmptyCart() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -55,54 +56,70 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCartContent(CartController controller) {
+  Widget buildCartContent(CartController controller) {
     return ListView(
       children: [
-        ...controller.cartItems.map((item) => _buildCartItem(item, controller)),
-        BuildOrderSummary(),
+        ...controller.cartItems.map((item) => buildCartItem(item, controller)),
+        buildOrderSummary(),
       ],
     );
   }
 
-  Widget _buildCartItem(CartItem item, CartController controller) {
-    print("Cart items are as follows: ${controller.cartItems[0].product.name}");
-    return Card(
-      margin: const EdgeInsets.all(8),
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Row(
-          children: [
-            Image.network(item.product.imageUrl, width: 80, height: 80),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+  Widget buildCartItem(CartItem item, CartController controller) {
+    return Slidable(
+      key: const ValueKey(0),
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        extentRatio: 0.20,
+        children: [
+          SlidableAction(
+            autoClose: true,
+            onPressed: (context) {},
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            icon: Icons.delete_outline_outlined,
+          ),
+        ],
+      ),
+      child: Card(
+        margin: const EdgeInsets.all(8),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            children: [
+              Image.network(item.product.imageUrl, width: 80, height: 80),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(item.product.nameKey, style: AppTextStyles.subtitle),
+                    Text('₹${item.product.price}',
+                        style: AppTextStyles.bodyText),
+                  ],
+                ),
+              ),
+              Row(
                 children: [
-                  Text(item.product.nameKey, style: AppTextStyles.subtitle),
-                  Text('₹${item.product.price}', style: AppTextStyles.bodyText),
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    onPressed: () => controller.decreaseQuantity(item),
+                  ),
+                  Text('${item.quantity}', style: AppTextStyles.bodyText),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () => controller.increaseQuantity(item),
+                  ),
                 ],
               ),
-            ),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: () => controller.decreaseQuantity(item),
-                ),
-                Text('${item.quantity}', style: AppTextStyles.bodyText),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () => controller.increaseQuantity(item),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildCheckoutButton(CartController controller) {
+  Widget buildCheckoutButton(CartController controller) {
     return controller.cartItems.isEmpty
         ? const IgnorePointer()
         : Container(

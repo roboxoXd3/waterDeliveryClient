@@ -73,6 +73,15 @@ class AppTextStyles {
     fontSize: 16,
     color: AppColors.darkTextColor,
   );
+  static const TextStyle white16TextStyle = TextStyle(
+    fontSize: 16,
+    color: Colors.white,
+    fontWeight: FontWeight.w500
+  );
+  static const TextStyle white18TextStyle = TextStyle(
+    fontSize: 18,
+    color: Colors.white,
+    fontWeight: FontWeight.w600
+  );
 
-// You can add more styles as needed for your app
 }

@@ -18,12 +18,23 @@ class HomePageController extends GetxController {
   String currentGreeting = '';
   List<Product> products = List.empty(growable: true);
   bool isLoading = true;
-  String getLocation = 'Unknown';
+  String getLocation = 'Unknown',userName = '';
+  
   CartController cartController = CartController();
   LanguageController languageController = LanguageController();
   LoginController loginController = LoginController();
+  User? user;
   @override
   void onInit() {
+    super.onInit();
+
+    user = Supabase.instance.client.auth.currentUser;
+    if (user != null) {
+      if (user!.userMetadata != null) {
+        userName = user!.userMetadata!['full_name'];
+        print(user!.userMetadata!['full_name']);
+      }
+    }
     currentGreeting = greeting();
     isLoading = true;
     fetchProducts();
@@ -106,8 +117,7 @@ class HomePageController extends GetxController {
     _selectedIndex.value = index;
   }
 
-
- get currentPage => _pages[selectedIndex];
+  get currentPage => _pages[selectedIndex];
 
   Future<void> fetchProducts() async {
     try {

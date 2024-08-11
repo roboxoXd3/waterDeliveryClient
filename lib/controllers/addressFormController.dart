@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -9,20 +11,91 @@ import '../services/supabaseServices.dart';
 class AddressFormController extends GetxController {
   final SupabaseService supabaseService = Get.find<SupabaseService>();
   final LocationService locationService = LocationService();
-
-  final RxBool isLoading = true.obs;
+  bool hasPermission = false;
+  bool isLoading = true;
   final RxList<String> formFields = <String>[].obs;
   final RxMap<String, TextEditingController> fieldControllers =
       <String, TextEditingController>{}.obs;
-
-  final Rx<Position?> currentPosition = Rx<Position?>(null);
-  final RxBool locationPermissionGranted = false.obs;
-
+  Placemark? firstAddress;
+  Position? position;
+  User? user;
   @override
   void onInit() {
     super.onInit();
+
+    user = Supabase.instance.client.auth.currentUser;
+
     initializeForm();
-    requestLocationPermission();
+    handleLocationPermission();
+  }
+
+  Future<void> getCurrentLocPosition() async {
+    hasPermission = await handleLocationPermission();
+
+    if (!hasPermission) {
+      EasyLoading.dismiss();
+
+      return;
+    }
+    try {
+      position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      if (position != null) {
+        List<Placemark> addresses = await placemarkFromCoordinates(
+            position!.latitude, position!.longitude);
+        firstAddress = addresses.first;
+
+        final street =
+            "${firstAddress!.name ?? ""}, ${firstAddress!.subLocality ?? ""}";
+        final city = firstAddress!.subLocality ?? "";
+        final state = firstAddress!.locality ?? "";
+        final postalCode = firstAddress!.postalCode ?? "";
+        final country = firstAddress!.country ?? "";
+
+        // Update controllers
+        fieldControllers['street']?.text = street;
+        fieldControllers['city']?.text = city;
+        fieldControllers['state']?.text = state;
+        fieldControllers['postal_code']?.text = postalCode;
+        fieldControllers['country']?.text = country;
+        if (user != null) {
+          if (user!.userMetadata != null) {
+            fieldControllers['nickname']?.text =
+                user!.userMetadata!['full_name'];
+          }
+        }
+      }
+
+      EasyLoading.dismiss();
+    } catch (e) {
+      EasyLoading.dismiss();
+
+      print(e.toString());
+    }
+    update();
+  }
+
+  Future<bool> handleLocationPermission() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return false;
+    } else {
+      hasPermission = true;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return false;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return false;
+    }
+
+    return true;
   }
 
   Future<void> initializeForm() async {
@@ -35,84 +108,34 @@ class AddressFormController extends GetxController {
     } catch (e) {
       Get.snackbar('Error', 'Failed to initialize form. Please try again.');
     } finally {
-      isLoading.value = false;
+      isLoading = false;
     }
-  }
-
-  Future<void> requestLocationPermission() async {
-    locationPermissionGranted.value =
-        await locationService.requestLocationPermission();
-    if (locationPermissionGranted.value) {
-      await getCurrentLocation();
-    } else {
-      Get.snackbar('Permission Denied',
-          'Location permission is required to use automatic address filling.');
-    }
-  }
-
-  Future<void> getCurrentLocation() async {
-    try {
-      final position = await locationService.getCurrentLocation();
-      if (position != null) {
-        currentPosition.value = position;
-      }
-    } catch (e) {
-      Get.snackbar('Error',
-          'Failed to get current location. You can still enter address manually.');
-    }
-  }
-
-  Future<void> useCurrentLocation() async {
-    if (currentPosition.value == null) {
-      Get.snackbar('Error',
-          'Location not available. Please try again or enter address manually.');
-      return;
-    }
-
-    try {
-      isLoading.value = true;
-      final address = await locationService.getAddressFromCoordinates(
-          currentPosition.value!.latitude, currentPosition.value!.longitude);
-      address.forEach((key, value) {
-        if (fieldControllers.containsKey(key)) {
-          fieldControllers[key]!.text = value;
-        }
-      });
-    } catch (e) {
-      Get.snackbar('Error',
-          'Failed to populate address fields. Please enter address manually.');
-    } finally {
-      isLoading.value = false;
-    }
+    update();
   }
 
   Future<void> submitForm() async {
     try {
-      isLoading.value = true;
-
-      final user = Supabase.instance.client.auth.currentUser;
+      isLoading = true;
+      update();
       if (user == null) {
         print('Error: User is not authenticated');
         throw Exception('User not authenticated');
       }
 
-      print('Authenticated User ID: ${user.id}');
+      print('Authenticated User ID: ${user!.id}');
 
       final addressData = <String, dynamic>{};
       fieldControllers.forEach((key, controller) {
         addressData[key] = controller.text;
       });
 
-// Include latitude and longitude if available
-      if (currentPosition.value != null) {
-        addressData['latitude'] = currentPosition.value!.latitude;
-        addressData['longitude'] = currentPosition.value!.longitude;
+      if (position != null) {
+        addressData['latitude'] = position!.latitude;
+        addressData['longitude'] = position!.longitude;
       }
 
-      // Add profile_id (this should match the user's auth.uid())
-      addressData['profile_id'] = user.id;
+      addressData['profile_id'] = user!.id;
 
-      // Add created_at timestamp
       addressData['created_at'] = DateTime.now().toIso8601String();
 
       print('Submitting address data: $addressData');
@@ -124,8 +147,9 @@ class AddressFormController extends GetxController {
       print('Error submitting form: $e');
       Get.snackbar('Error', 'Failed to save address. Please try again.');
     } finally {
-      isLoading.value = false;
+      isLoading = false;
     }
+    update();
   }
 
   @override

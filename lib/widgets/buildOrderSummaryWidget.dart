@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../constants/app_text_styles.dart';
 import '../controllers/cartController.dart';
 
-Widget BuildOrderSummary() {
+Widget buildOrderSummary() {
   final CartController controller = Get.find<CartController>();
   return Card(
     margin: const EdgeInsets.all(8),

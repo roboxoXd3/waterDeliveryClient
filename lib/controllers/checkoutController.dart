@@ -69,24 +69,19 @@ class CheckoutController extends GetxController {
   }
 
   void placeOrder() {
-    // if (!termsAccepted.value) {
-    //   Get.snackbar('Error', 'Please accept the terms and conditions');
-    //   return;
-    // }
+   
     if (selectedAddress.value == null) {
-      Get.snackbar('Error', 'Please select a delivery address');
+      Get.snackbar('', 'Please select a delivery address');
       return;
     }
     if (selectedDate.value == null) {
-      Get.snackbar('Error', 'Please select a delivery date');
+      Get.snackbar('', 'Please select a delivery date');
       return;
     }
     if (selectedPaymentMethod.value == null) {
-      Get.snackbar('Error', 'Please select a payment method');
+      Get.snackbar('', 'Please select a payment method');
       return;
     }
 
-    // Implement order placement logic
-    // You can now access selectedAddress.value here for the delivery address
   }
 }

@@ -24,10 +24,8 @@ class CartController extends GetxController {
     final existingItemIndex =
         cartItems.indexWhere((item) => item.product.id == product.id);
     if (existingItemIndex != -1) {
-      // Item exists, increment quantity
       cartItems[existingItemIndex].incrementQuantity();
     } else {
-      // Item doesn't exist, add new item
       cartItems.add(CartItem(product: product));
     }
     _saveCartToStorage();
@@ -77,8 +75,7 @@ class CartController extends GetxController {
   }
 
   void proceedToCheckout() {
-    // Get.toNamed('/map');
-    // Get.toNamed('/add-address');
+
     Get.toNamed('/addresses');
   }
 }

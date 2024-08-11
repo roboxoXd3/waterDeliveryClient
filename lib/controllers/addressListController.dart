@@ -1,13 +1,13 @@
 import 'package:get/get.dart';
+import 'package:sheetal_raj_jal/routes/app_pages.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabaseServices.dart';
 
 class AddressListController extends GetxController {
   final RxList<Map<String, dynamic>> addresses = <Map<String, dynamic>>[].obs;
-  final RxBool isLoading = true.obs;
+  bool isLoading = true;
   final SupabaseService _supabaseService = SupabaseService();
-
-  // Add this line to store the selected address
+  String getLocation = '';
   final Rx<Map<String, dynamic>?> selectedAddress =
       Rx<Map<String, dynamic>?>(null);
 
@@ -17,10 +17,10 @@ class AddressListController extends GetxController {
     fetchAddresses();
   }
 
+ 
   Future<void> fetchAddresses() async {
     try {
-      // print("")
-      isLoading.value = true;
+      isLoading = true;
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) {
         print('User not authenticated');
@@ -37,12 +37,13 @@ class AddressListController extends GetxController {
       print('Error fetching addresses: $e');
       // Get.snackbar('Error', 'Failed to fetch addresses');
     } finally {
-      isLoading.value = false;
+      isLoading = false;
     }
+    update();
   }
 
   void navigateToAddAddress() async {
-    final result = await Get.toNamed('/add-address');
+    final result = await Get.toNamed(Routes.addAddresses);
     if (result == true) {
       fetchAddresses();
     }
@@ -54,7 +55,9 @@ class AddressListController extends GetxController {
 
   Future<bool> deleteAddress(String id) async {
     try {
-      isLoading.value = true;
+      isLoading = true;
+      update();
+
       print('Controller: Attempting to delete address with id: $id');
       final deleted = await _supabaseService.deleteAddress(id);
       if (deleted) {
@@ -71,17 +74,16 @@ class AddressListController extends GetxController {
       Get.snackbar('Error', 'Failed to delete address: ${e.toString()}');
       return false;
     } finally {
-      isLoading.value = false;
+      isLoading = false;
+      update();
     }
   }
 
-  // Update this method to store the selected address and navigate to checkout
   void selectAddress(Map<String, dynamic> address) {
     selectedAddress.value = address;
-    Get.toNamed('/checkout');
+    Get.toNamed(Routes.checkoutPage);
   }
 
-  // Add this method to clear the selected address when leaving the address list
   @override
   void onClose() {
     selectedAddress.value = null;
